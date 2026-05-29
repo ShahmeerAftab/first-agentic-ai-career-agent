@@ -49,4 +49,4 @@ a cover letter for you — all powered by AI.
 git clone https://github.com/your-username/ai-resume-analyzer.git
 cd ai-resume-analyzer
 
->>>>>>> 0770596a26eeac70a6308b33efa22226bbc505d4
+
