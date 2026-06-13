@@ -207,7 +207,7 @@ export default function Home() {
   const [location,      setLocation]      = useState("");
   const resultsRef = useRef(null);
 
-  // Scroll to results when upload completes
+  // scroll to results section when upload finishes
   useEffect(() => {
     if (uploadResult && resultsRef.current) {
       setTimeout(() => {
@@ -216,35 +216,34 @@ export default function Home() {
     }
   }, [uploadResult]);
 
-  // Auto-trigger career agent after upload
+  // runs the deeper AI agent automatically after upload completes
   useEffect(() => {
-    if (!uploadResult?.id) return;
+    if (!uploadResult?.id) return; // do nothing if no upload yet
 
     setAgentLoading(true);
     setAgentResult(null);
     setAgentError(null);
 
-    const startedAt = Date.now();
+    const startedAt = Date.now(); // track how long the agent takes
 
     runCareerAgent({ resumeId: uploadResult.id, location })
       .then((result) => {
         setAgentResult(result);
-        // Persist a lightweight summary to localStorage for the History page
+        // save a small summary to localStorage so it shows up on the History page
         saveRun({
           resumeId:       uploadResult.id,
-          filename:       uploadResult.filename       ?? "resume.pdf",
-          atsScore:       result.resumeAnalysis?.atsScore ?? 0,
-          jobCount:       result.jobSuggestions?.length  ?? 0,
-          hasRoadmap:     !!result.learningRoadmap,
+          filename:       uploadResult.filename            ?? "resume.pdf",
+          atsScore:       result.resumeAnalysis?.atsScore  ?? 0,
+          jobCount:       result.jobSuggestions?.length    ?? 0,
+          hasRoadmap:     !!result.learningRoadmap,      // !! converts any value to true/false
           hasImprovement: !!result.improvementSuggestions,
           durationMs:     Date.now() - startedAt,
         });
       })
       .catch((err) => setAgentError(err.message))
       .finally(() => setAgentLoading(false));
-  // location captured at trigger time — intentionally not in deps
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadResult?.id]);
+  }, [uploadResult?.id]); // only re-run when a new resume is uploaded
 
   function handleReset() {
     setUploadResult(null);

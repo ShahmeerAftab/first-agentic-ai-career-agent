@@ -4,41 +4,43 @@ import { useState } from "react";
 import { uploadResume } from "../services/resumeService";
 
 export function useUpload() {
-  const [file,     setFile]     = useState(null);
-  const [loading,  setLoading]  = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [error,    setError]    = useState(null);
-  const [result,   setResult]   = useState(null);
 
+  // useState stores values that cause the UI to re-render when they change
+  const [file,     setFile]     = useState(null);   // the PDF file the user picked
+  const [loading,  setLoading]  = useState(false);  // true while the API call is in progress
+  const [progress, setProgress] = useState(0);      // upload percentage 0–100
+  const [error,    setError]    = useState(null);   // error message string or null
+  const [result,   setResult]   = useState(null);   // the analysis result from the backend
+
+  // called when the user picks or drops a file
   const selectFile = (picked) => {
-    console.log("[useUpload] File selected:", { name: picked.name, size: picked.size, type: picked.type });
     setFile(picked);
-    setError(null);
-    setResult(null);
+    setError(null);  // clear any previous error
+    setResult(null); // clear any previous result
   };
 
+  // called when the user clicks the Analyze button
   const submit = async () => {
     if (!file) return;
 
-    console.log("[useUpload] Submitting:", file.name);
     setLoading(true);
     setProgress(0);
     setError(null);
     setResult(null);
 
     try {
-      const data = await uploadResume(file, setProgress);
-      console.log("[useUpload] API response stored in state:", data);
+      const data = await uploadResume(file, setProgress); // setProgress updates the progress bar
       setResult(data);
     } catch (err) {
-      console.error("[useUpload] Upload failed:", err.message);
       setError(err.message);
     } finally {
+      // finally runs whether the call succeeded or failed
       setLoading(false);
       setProgress(0);
     }
   };
 
+  // resets everything back to the initial empty state
   const reset = () => {
     setFile(null);
     setError(null);
@@ -46,5 +48,6 @@ export function useUpload() {
     setProgress(0);
   };
 
+  // return everything so components can use them
   return { file, loading, progress, error, result, selectFile, submit, reset };
 }

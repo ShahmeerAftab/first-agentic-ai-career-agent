@@ -1,43 +1,37 @@
-const KEY      = "resume_ai_runs";
-const MAX_RUNS = 20;
+// saves and loads resume analysis history in the browser's localStorage
+// localStorage persists between page refreshes — no backend or account needed
 
-/**
- * @typedef {Object} HistoryEntry
- * @property {string}  resumeId
- * @property {string}  filename
- * @property {number}  atsScore
- * @property {number}  jobCount
- * @property {boolean} hasRoadmap
- * @property {boolean} hasImprovement
- * @property {number|null} durationMs
- * @property {string}  savedAt   ISO timestamp
- */
+const STORAGE_KEY = "resume_ai_runs";
+const MAX_RUNS    = 20; // keep only the 20 most recent runs
 
-/** Save a completed agent run to localStorage. */
+// adds a new run to the top of the history list
 export function saveRun(entry) {
-  const list    = loadRuns();
-  const updated = [{ ...entry, savedAt: new Date().toISOString() }, ...list]
+  const existingRuns = loadRuns();
+
+  // put the new entry first, add a timestamp, then keep only the latest 20
+  const updated = [{ ...entry, savedAt: new Date().toISOString() }, ...existingRuns]
     .slice(0, MAX_RUNS);
+
   try {
-    localStorage.setItem(KEY, JSON.stringify(updated));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   } catch {
-    // Storage quota exceeded — silently ignore
+    // silently ignore if localStorage is full or unavailable
   }
 }
 
-/** Load all saved runs, newest first. */
+// returns all saved runs (newest first), or [] if nothing is saved yet
 export function loadRuns() {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
-    return [];
+    return []; // return empty array if data is corrupt
   }
 }
 
-/** Wipe the entire local history. */
+// deletes all saved history from localStorage
 export function clearRuns() {
   try {
-    localStorage.removeItem(KEY);
+    localStorage.removeItem(STORAGE_KEY);
   } catch {}
 }

@@ -4,8 +4,6 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-[#E4E7ED]">
       <div className="max-w-170 mx-auto px-4 h-14 flex items-center justify-between">
-
-        {/* Brand — also serves as the "Analyze" / home link */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 bg-brand-600 rounded-[10px] flex items-center justify-center
                           text-white shadow-sm shadow-brand-200 shrink-0">
